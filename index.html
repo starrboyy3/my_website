@@ -163,7 +163,6 @@
     <script>
     'use strict';
 
-    // ── Renderer setup ──────────────────────────────────────────────────────
     const canvas   = document.getElementById('bg-canvas');
     const scene    = new THREE.Scene();
     const camera   = new THREE.PerspectiveCamera(65, innerWidth / innerHeight, 0.1, 3000);
@@ -179,7 +178,6 @@
     const rand = (a, b) => a + Math.random() * (b - a);
     const PI2  = Math.PI * 2;
 
-    // ── Shared glowing-point shader ─────────────────────────────────────────
     function makeGlowMaterial() {
         return new THREE.ShaderMaterial({
             uniforms: { uTime: { value: 0 } },
@@ -227,22 +225,19 @@
         return geo;
     }
 
-    // ── 1. Background star field ─────────────────────────────────────────────
     const starGeo = fillBuffer(14000, (i, pos, col, size, spd) => {
         const i3 = i * 3;
         pos[i3]     = rand(-1400, 1400);
         pos[i3 + 1] = rand(-1400, 1400);
         pos[i3 + 2] = rand(-1400, 1400);
-
         const t = Math.random();
-        if (t < 0.60) {                                       // blue-white
+        if (t < 0.60) {
             col[i3] = 0.75 + t * 0.35; col[i3+1] = 0.82 + t * 0.18; col[i3+2] = 1.0;
-        } else if (t < 0.82) {                               // violet
+        } else if (t < 0.82) {
             col[i3] = 0.45; col[i3+1] = 0.05; col[i3+2] = 0.9;
-        } else {                                              // amber
+        } else {
             col[i3] = 1.0;  col[i3+1] = 0.78; col[i3+2] = 0.18;
         }
-
         size[i] = rand(0.4, 3.2);
         spd[i]  = rand(0.4, 3.0);
     });
@@ -250,7 +245,6 @@
     const starPoints = new THREE.Points(starGeo, starMat);
     scene.add(starPoints);
 
-    // ── 2. Galaxy spiral ────────────────────────────────────────────────────
     const galaxyGeo = fillBuffer(9000, (i, pos, col, size, spd) => {
         const i3   = i * 3;
         const arms = 3;
@@ -258,16 +252,12 @@
         const r    = t * 420;
         const arm  = i % arms;
         const ang  = (arm / arms) * PI2 + t * 2.6 + rand(-0.3, 0.3);
-
         pos[i3]     = Math.cos(ang) * r + rand(-18, 18) * t;
         pos[i3 + 1] = rand(-12, 12) * (1 - t * 0.55);
         pos[i3 + 2] = Math.sin(ang) * r + rand(-18, 18) * t - 180;
-
-        // core = gold-warm → arms = purple-blue
         col[i3]     = 0.85 * (1 - t) + 0.28 * t;
         col[i3 + 1] = 0.62 * (1 - t) + 0.08 * t;
         col[i3 + 2] = 0.18 * (1 - t) + 0.92 * t;
-
         size[i] = rand(0.3, 2.4);
         spd[i]  = rand(0.2, 1.4);
     });
@@ -275,22 +265,18 @@
     const galaxyPoints = new THREE.Points(galaxyGeo, galaxyMat);
     scene.add(galaxyPoints);
 
-    // ── 3. Nebula clouds ────────────────────────────────────────────────────
     const nebulaGeo = fillBuffer(2800, (i, pos, col, size, spd) => {
         const i3 = i * 3;
         const r  = rand(160, 520);
         const th = rand(0, PI2);
         const ph = Math.acos(rand(-1, 1));
-
         pos[i3]     = r * Math.sin(ph) * Math.cos(th);
         pos[i3 + 1] = r * Math.sin(ph) * Math.sin(th) * 0.38;
         pos[i3 + 2] = r * Math.cos(ph) - 90;
-
         const t = Math.random();
         col[i3]     = 0.28 + t * 0.42;
         col[i3 + 1] = 0.02 + t * 0.12;
         col[i3 + 2] = 0.58 + t * 0.42;
-
         size[i] = rand(10, 35);
         spd[i]  = rand(0.08, 0.45);
     });
@@ -325,7 +311,6 @@
     const nebulaPoints = new THREE.Points(nebulaGeo, nebulaMat);
     scene.add(nebulaPoints);
 
-    // ── 4. Shooting stars ───────────────────────────────────────────────────
     const shooters = [];
 
     function spawnShooter() {
@@ -337,31 +322,26 @@
         const sz    = rand(-60, 80);
         const dx    = rand(9, 20);
         const dy    = -rand(7, 16);
-
         for (let i = 0; i < trail; i++) {
             pos[i * 3]     = sx - i * dx * 0.65;
             pos[i * 3 + 1] = sy + i * Math.abs(dy) * 0.65;
             pos[i * 3 + 2] = sz;
         }
         geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-
         const mat  = new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.85 });
         const line = new THREE.Line(geo, mat);
         scene.add(line);
         shooters.push({ line, dx, dy, life: 0, max: 55 });
     }
 
-    // ── Mouse parallax ──────────────────────────────────────────────────────
     let mx = 0, my = 0;
     window.addEventListener('mousemove', e => {
         mx = (e.clientX / innerWidth  - 0.5) * 2;
         my = (e.clientY / innerHeight - 0.5) * 2;
     });
 
-    // ── Click burst ─────────────────────────────────────────────────────────
     window.addEventListener('click', () => spawnShooter());
 
-    // ── Animation loop ──────────────────────────────────────────────────────
     let t = 0;
     (function animate() {
         requestAnimationFrame(animate);
@@ -377,27 +357,22 @@
         nebulaPoints.rotation.y  = t * 0.009;
         nebulaPoints.rotation.x  = Math.sin(t * 0.04) * 0.06;
 
-        // Camera parallax
         camera.position.x += (mx * 38 - camera.position.x) * 0.04;
         camera.position.y += (-my * 22 + 60 - camera.position.y) * 0.04;
         camera.lookAt(0, 0, 0);
 
-        // Auto-spawn shooting stars
         if (Math.random() < 0.007 && shooters.length < 5) spawnShooter();
 
-        // Update shooting stars
         for (let i = shooters.length - 1; i >= 0; i--) {
             const s   = shooters[i];
             const arr = s.line.geometry.attributes.position.array;
             s.life++;
-
             for (let j = 0; j < arr.length / 3; j++) {
                 arr[j * 3]     += s.dx;
                 arr[j * 3 + 1] += s.dy;
             }
             s.line.geometry.attributes.position.needsUpdate = true;
             s.line.material.opacity = 0.85 * (1 - s.life / s.max);
-
             if (s.life >= s.max) {
                 scene.remove(s.line);
                 s.line.geometry.dispose();
@@ -409,7 +384,6 @@
         renderer.render(scene, camera);
     })();
 
-    // ── Resize ──────────────────────────────────────────────────────────────
     window.addEventListener('resize', () => {
         camera.aspect = innerWidth / innerHeight;
         camera.updateProjectionMatrix();
