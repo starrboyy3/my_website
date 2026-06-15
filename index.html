@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STARBOY</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@900&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #000;
+            overflow: hidden;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        #bg-canvas {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+        }
+
+        /* Vignette */
+        .vignette {
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+            background: radial-gradient(
+                ellipse at center,
+                transparent 40%,
+                rgba(0, 0, 10, 0.6) 100%
+            );
+            pointer-events: none;
+        }
+
+        .scene {
+            position: fixed;
+            inset: 0;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+        }
+
+        /* CRT scanlines */
+        .scene::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent 0px,
+                transparent 2px,
+                rgba(0, 0, 0, 0.035) 2px,
+                rgba(0, 0, 0, 0.035) 4px
+            );
+            pointer-events: none;
+        }
+
+        .glow-wrapper {
+            filter:
+                drop-shadow(0 0 8px rgba(255, 255, 255, 0.7))
+                drop-shadow(0 0 25px rgba(168, 85, 247, 1))
+                drop-shadow(0 0 60px rgba(168, 85, 247, 0.7))
+                drop-shadow(0 0 120px rgba(240, 192, 64, 0.35));
+            animation: glow-pulse 3.5s ease-in-out infinite;
+        }
+
+        @keyframes glow-pulse {
+            0%, 100% {
+                filter:
+                    drop-shadow(0 0 8px rgba(255, 255, 255, 0.7))
+                    drop-shadow(0 0 25px rgba(168, 85, 247, 1))
+                    drop-shadow(0 0 60px rgba(168, 85, 247, 0.7))
+                    drop-shadow(0 0 120px rgba(240, 192, 64, 0.35));
+            }
+            50% {
+                filter:
+                    drop-shadow(0 0 12px rgba(255, 255, 255, 1))
+                    drop-shadow(0 0 45px rgba(168, 85, 247, 1))
+                    drop-shadow(0 0 100px rgba(168, 85, 247, 0.9))
+                    drop-shadow(0 0 200px rgba(240, 192, 64, 0.55));
+            }
+        }
+
+        .starboy-text {
+            font-family: 'Orbitron', 'Arial Black', sans-serif;
+            font-size: clamp(2.8rem, 11vw, 13rem);
+            font-weight: 900;
+            letter-spacing: 0.18em;
+            background: linear-gradient(
+                130deg,
+                #ffffff   0%,
+                #e8d5a3  12%,
+                #f0c040  26%,
+                #ffffff  42%,
+                #d8b4fe  58%,
+                #a855f7  72%,
+                #c084fc  82%,
+                #f0c040  92%,
+                #ffffff 100%
+            );
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation:
+                shimmer   5s   ease-in-out infinite,
+                slide-in  1.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            opacity: 0;
+        }
+
+        @keyframes shimmer {
+            0%   { background-position: 0%   50%; }
+            50%  { background-position: 100% 50%; }
+            100% { background-position: 0%   50%; }
+        }
+
+        @keyframes slide-in {
+            from {
+                opacity: 0;
+                transform: scale(0.65) translateY(50px);
+                letter-spacing: 0.6em;
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+                letter-spacing: 0.18em;
+            }
+        }
+
+        .tagline {
+            font-family: 'Orbitron', monospace;
+            font-size: clamp(0.4rem, 1.4vw, 0.85rem);
+            letter-spacing: 0.65em;
+            color: rgba(196, 132, 252, 0.55);
+            margin-top: 1.6rem;
+            text-transform: uppercase;
+            animation: slide-in 1.4s cubic-bezier(0.16, 1, 0.3, 1) 0.25s both;
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="bg-canvas"></canvas>
+    <div class="vignette"></div>
+
+    <div class="scene">
+        <div class="glow-wrapper">
+            <div class="starboy-text">STARBOY</div>
+        </div>
+        <div class="tagline">&#9733; &nbsp; The Galaxy Is Yours &nbsp; &#9733;</div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+    <script>
+    'use strict';
+
+    // ── Renderer setup ──────────────────────────────────────────────────────
+    const canvas   = document.getElementById('bg-canvas');
+    const scene    = new THREE.Scene();
+    const camera   = new THREE.PerspectiveCamera(65, innerWidth / innerHeight, 0.1, 3000);
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+
+    renderer.setSize(innerWidth, innerHeight);
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    renderer.setClearColor(0x000008);
+
+    camera.position.set(0, 60, 480);
+    camera.lookAt(0, 0, 0);
+
+    const rand = (a, b) => a + Math.random() * (b - a);
+    const PI2  = Math.PI * 2;
+
+    // ── Shared glowing-point shader ─────────────────────────────────────────
+    function makeGlowMaterial() {
+        return new THREE.ShaderMaterial({
+            uniforms: { uTime: { value: 0 } },
+            vertexShader: `
+                attribute float aSize;
+                attribute float aSpeed;
+                attribute vec3  aColor;
+                varying   vec3  vColor;
+                uniform   float uTime;
+
+                void main() {
+                    vColor = aColor;
+                    float flicker = 0.65 + 0.35 * sin(uTime * aSpeed + position.x * 0.09 + position.y * 0.06);
+                    vec4 mv = modelViewMatrix * vec4(position, 1.0);
+                    gl_PointSize = aSize * flicker * (300.0 / -mv.z);
+                    gl_Position  = projectionMatrix * mv;
+                }
+            `,
+            fragmentShader: `
+                varying vec3 vColor;
+                void main() {
+                    float d = distance(gl_PointCoord, vec2(0.5));
+                    if (d > 0.5) discard;
+                    float a = 1.0 - smoothstep(0.05, 0.5, d);
+                    gl_FragColor = vec4(vColor, a);
+                }
+            `,
+            transparent: true,
+            blending:    THREE.AdditiveBlending,
+            depthWrite:  false,
+        });
+    }
+
+    function fillBuffer(count, fn) {
+        const pos  = new Float32Array(count * 3);
+        const col  = new Float32Array(count * 3);
+        const size = new Float32Array(count);
+        const spd  = new Float32Array(count);
+        for (let i = 0; i < count; i++) fn(i, pos, col, size, spd);
+        const geo = new THREE.BufferGeometry();
+        geo.setAttribute('position', new THREE.BufferAttribute(pos,  3));
+        geo.setAttribute('aColor',   new THREE.BufferAttribute(col,  3));
+        geo.setAttribute('aSize',    new THREE.BufferAttribute(size, 1));
+        geo.setAttribute('aSpeed',   new THREE.BufferAttribute(spd,  1));
+        return geo;
+    }
+
+    // ── 1. Background star field ─────────────────────────────────────────────
+    const starGeo = fillBuffer(14000, (i, pos, col, size, spd) => {
+        const i3 = i * 3;
+        pos[i3]     = rand(-1400, 1400);
+        pos[i3 + 1] = rand(-1400, 1400);
+        pos[i3 + 2] = rand(-1400, 1400);
+
+        const t = Math.random();
+        if (t < 0.60) {                                       // blue-white
+            col[i3] = 0.75 + t * 0.35; col[i3+1] = 0.82 + t * 0.18; col[i3+2] = 1.0;
+        } else if (t < 0.82) {                               // violet
+            col[i3] = 0.45; col[i3+1] = 0.05; col[i3+2] = 0.9;
+        } else {                                              // amber
+            col[i3] = 1.0;  col[i3+1] = 0.78; col[i3+2] = 0.18;
+        }
+
+        size[i] = rand(0.4, 3.2);
+        spd[i]  = rand(0.4, 3.0);
+    });
+    const starMat    = makeGlowMaterial();
+    const starPoints = new THREE.Points(starGeo, starMat);
+    scene.add(starPoints);
+
+    // ── 2. Galaxy spiral ────────────────────────────────────────────────────
+    const galaxyGeo = fillBuffer(9000, (i, pos, col, size, spd) => {
+        const i3   = i * 3;
+        const arms = 3;
+        const t    = Math.random();
+        const r    = t * 420;
+        const arm  = i % arms;
+        const ang  = (arm / arms) * PI2 + t * 2.6 + rand(-0.3, 0.3);
+
+        pos[i3]     = Math.cos(ang) * r + rand(-18, 18) * t;
+        pos[i3 + 1] = rand(-12, 12) * (1 - t * 0.55);
+        pos[i3 + 2] = Math.sin(ang) * r + rand(-18, 18) * t - 180;
+
+        // core = gold-warm → arms = purple-blue
+        col[i3]     = 0.85 * (1 - t) + 0.28 * t;
+        col[i3 + 1] = 0.62 * (1 - t) + 0.08 * t;
+        col[i3 + 2] = 0.18 * (1 - t) + 0.92 * t;
+
+        size[i] = rand(0.3, 2.4);
+        spd[i]  = rand(0.2, 1.4);
+    });
+    const galaxyMat    = makeGlowMaterial();
+    const galaxyPoints = new THREE.Points(galaxyGeo, galaxyMat);
+    scene.add(galaxyPoints);
+
+    // ── 3. Nebula clouds ────────────────────────────────────────────────────
+    const nebulaGeo = fillBuffer(2800, (i, pos, col, size, spd) => {
+        const i3 = i * 3;
+        const r  = rand(160, 520);
+        const th = rand(0, PI2);
+        const ph = Math.acos(rand(-1, 1));
+
+        pos[i3]     = r * Math.sin(ph) * Math.cos(th);
+        pos[i3 + 1] = r * Math.sin(ph) * Math.sin(th) * 0.38;
+        pos[i3 + 2] = r * Math.cos(ph) - 90;
+
+        const t = Math.random();
+        col[i3]     = 0.28 + t * 0.42;
+        col[i3 + 1] = 0.02 + t * 0.12;
+        col[i3 + 2] = 0.58 + t * 0.42;
+
+        size[i] = rand(10, 35);
+        spd[i]  = rand(0.08, 0.45);
+    });
+
+    const nebulaMat = new THREE.ShaderMaterial({
+        uniforms: { uTime: { value: 0 } },
+        vertexShader: `
+            attribute float aSize;
+            attribute vec3  aColor;
+            varying   vec3  vColor;
+            void main() {
+                vColor = aColor;
+                vec4 mv = modelViewMatrix * vec4(position, 1.0);
+                gl_PointSize = aSize * (300.0 / -mv.z);
+                gl_Position  = projectionMatrix * mv;
+            }
+        `,
+        fragmentShader: `
+            varying vec3 vColor;
+            void main() {
+                float d = distance(gl_PointCoord, vec2(0.5));
+                if (d > 0.5) discard;
+                float a = (1.0 - smoothstep(0.0, 0.5, d)) * 0.11;
+                gl_FragColor = vec4(vColor, a);
+            }
+        `,
+        transparent: true,
+        blending:    THREE.AdditiveBlending,
+        depthWrite:  false,
+    });
+
+    const nebulaPoints = new THREE.Points(nebulaGeo, nebulaMat);
+    scene.add(nebulaPoints);
+
+    // ── 4. Shooting stars ───────────────────────────────────────────────────
+    const shooters = [];
+
+    function spawnShooter() {
+        const trail = 28;
+        const geo   = new THREE.BufferGeometry();
+        const pos   = new Float32Array(trail * 3);
+        const sx    = rand(-700, 700);
+        const sy    = rand(80, 380);
+        const sz    = rand(-60, 80);
+        const dx    = rand(9, 20);
+        const dy    = -rand(7, 16);
+
+        for (let i = 0; i < trail; i++) {
+            pos[i * 3]     = sx - i * dx * 0.65;
+            pos[i * 3 + 1] = sy + i * Math.abs(dy) * 0.65;
+            pos[i * 3 + 2] = sz;
+        }
+        geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+
+        const mat  = new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.85 });
+        const line = new THREE.Line(geo, mat);
+        scene.add(line);
+        shooters.push({ line, dx, dy, life: 0, max: 55 });
+    }
+
+    // ── Mouse parallax ──────────────────────────────────────────────────────
+    let mx = 0, my = 0;
+    window.addEventListener('mousemove', e => {
+        mx = (e.clientX / innerWidth  - 0.5) * 2;
+        my = (e.clientY / innerHeight - 0.5) * 2;
+    });
+
+    // ── Click burst ─────────────────────────────────────────────────────────
+    window.addEventListener('click', () => spawnShooter());
+
+    // ── Animation loop ──────────────────────────────────────────────────────
+    let t = 0;
+    (function animate() {
+        requestAnimationFrame(animate);
+        t += 0.008;
+
+        starMat.uniforms.uTime.value    = t;
+        galaxyMat.uniforms.uTime.value  = t;
+        nebulaMat.uniforms.uTime.value  = t;
+
+        starPoints.rotation.y    = t * 0.014;
+        starPoints.rotation.x    = Math.sin(t * 0.009) * 0.07;
+        galaxyPoints.rotation.y  = t * 0.022;
+        nebulaPoints.rotation.y  = t * 0.009;
+        nebulaPoints.rotation.x  = Math.sin(t * 0.04) * 0.06;
+
+        // Camera parallax
+        camera.position.x += (mx * 38 - camera.position.x) * 0.04;
+        camera.position.y += (-my * 22 + 60 - camera.position.y) * 0.04;
+        camera.lookAt(0, 0, 0);
+
+        // Auto-spawn shooting stars
+        if (Math.random() < 0.007 && shooters.length < 5) spawnShooter();
+
+        // Update shooting stars
+        for (let i = shooters.length - 1; i >= 0; i--) {
+            const s   = shooters[i];
+            const arr = s.line.geometry.attributes.position.array;
+            s.life++;
+
+            for (let j = 0; j < arr.length / 3; j++) {
+                arr[j * 3]     += s.dx;
+                arr[j * 3 + 1] += s.dy;
+            }
+            s.line.geometry.attributes.position.needsUpdate = true;
+            s.line.material.opacity = 0.85 * (1 - s.life / s.max);
+
+            if (s.life >= s.max) {
+                scene.remove(s.line);
+                s.line.geometry.dispose();
+                s.line.material.dispose();
+                shooters.splice(i, 1);
+            }
+        }
+
+        renderer.render(scene, camera);
+    })();
+
+    // ── Resize ──────────────────────────────────────────────────────────────
+    window.addEventListener('resize', () => {
+        camera.aspect = innerWidth / innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(innerWidth, innerHeight);
+    });
+    </script>
+</body>
+</html>
