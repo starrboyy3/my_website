@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <meta name="theme-color" content="#07070f">
+  <title>OT Prep — Anaesthesia</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:       #07070f;
+      --surface:  #0f0f1e;
+      --card:     #14142a;
+      --border:   #252540;
+      --purple:   #7c3aed;
+      --purplt:   #a78bfa;
+      --gold:     #f0c040;
+      --green:    #10b981;
+      --red:      #ef4444;
+      --text:     #e2e8f0;
+      --sub:      #94a3b8;
+      --dim:      #475569;
+      --r:        12px;
+    }
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'Inter',system-ui,sans-serif; background:var(--bg); color:var(--text); min-height:100vh; padding-bottom:5rem; }
+    .hdr { position:sticky; top:0; z-index:100; background:rgba(7,7,15,.93); backdrop-filter:blur(12px); border-bottom:1px solid var(--border); padding:.7rem 1rem; display:flex; align-items:center; gap:.75rem; }
+    .back { color:var(--purplt); text-decoration:none; font-size:.75rem; font-weight:700; letter-spacing:.05em; padding:.3rem .6rem; border:1px solid var(--purple); border-radius:6px; flex-shrink:0; }
+    .hdr-title { font-family:'Orbitron',sans-serif; font-size:.95rem; font-weight:900; letter-spacing:.18em; background:linear-gradient(120deg,var(--gold),var(--purplt)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; flex:1; text-align:center; }
+    .rst-btn { background:none; border:1px solid var(--red); color:var(--red); font-size:.72rem; font-weight:700; padding:.3rem .55rem; border-radius:6px; cursor:pointer; flex-shrink:0; }
+    .prog-wrap { padding:.65rem 1rem .5rem; background:var(--surface); border-bottom:1px solid var(--border); }
+    .prog-row { display:flex; justify-content:space-between; font-size:.72rem; color:var(--sub); margin-bottom:.35rem; }
+    .prog-bg { height:5px; background:var(--border); border-radius:99px; overflow:hidden; }
+    .prog-fill { height:100%; background:linear-gradient(90deg,var(--purple),var(--gold)); border-radius:99px; transition:width .3s ease; width:0%; }
+    .sec { padding:1rem; margin-top:.5rem; }
+    .sec-title { font-family:'Orbitron',sans-serif; font-size:.65rem; font-weight:700; letter-spacing:.15em; color:var(--sub); text-transform:uppercase; margin-bottom:.65rem; }
+    .det-card { background:var(--card); border:1px solid var(--border); border-radius:var(--r); overflow:hidden; }
+    .det-toggle { display:flex; align-items:center; justify-content:space-between; padding:.75rem 1rem; font-size:.82rem; font-weight:600; color:var(--gold); cursor:pointer; user-select:none; border-bottom:1px solid var(--border); }
+    .det-toggle .arr { font-size:.65rem; transition:transform .2s; }
+    .det-toggle.coll .arr { transform:rotate(-90deg); }
+    .det-body { padding:.75rem 1rem; }
+    .det-body.hide { display:none; }
+    .irow { display:grid; gap:.45rem; margin-bottom:.45rem; }
+    .irow.c2 { grid-template-columns:1fr 1fr; }
+    .irow.c3 { grid-template-columns:2fr 1fr 1fr; }
+    .irow.c1 { grid-template-columns:1fr; }
+    input, select, textarea { background:var(--surface); border:1px solid var(--border); color:var(--text); border-radius:8px; padding:.5rem .65rem; font-size:.82rem; font-family:inherit; width:100%; outline:none; transition:border-color .2s; }
+    input:focus, select:focus, textarea:focus { border-color:var(--purple); }
+    input::placeholder, textarea::placeholder { color:var(--dim); }
+    textarea { resize:vertical; min-height:56px; }
+    select option { background:var(--card); }
+    .bz-banner { margin:.25rem 1rem .5rem; border-radius:var(--r); padding:.7rem 1rem; display:none; align-items:center; gap:.75rem; border:2px solid; }
+    .bz-banner.vis { display:flex; }
+    .bz-dot { width:26px; height:26px; border-radius:50%; flex-shrink:0; }
+    .bz-lbl { font-size:.68rem; color:var(--sub); }
+    .bz-name { font-weight:700; font-size:.9rem; }
+    .bz-info-btn { background:none; border:none; color:#60a5fa; font-size:.9rem; cursor:pointer; margin-left:auto; padding:.2rem; }
+    .grp-card { background:var(--card); border:1px solid var(--border); border-radius:var(--r); overflow:hidden; margin-bottom:.65rem; }
+    .grp-hdr { padding:.55rem 1rem; font-size:.68rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; border-left:3px solid; display:flex; align-items:center; gap:.4rem; }
+    .grp-cnt { margin-left:auto; font-size:.62rem; opacity:.7; }
+    .chk-row { display:flex; align-items:flex-start; gap:.55rem; padding:.7rem 1rem; border-top:1px solid var(--border); }
+    .chk-input { display:none; }
+    .chk-box { width:22px; height:22px; border:2px solid var(--border); border-radius:6px; flex-shrink:0; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:all .15s; margin-top:1px; }
+    .chk-input:checked + .chk-box { background:var(--green); border-color:var(--green); }
+    .chk-input:checked + .chk-box::after { content:'✓'; color:#000; font-size:13px; font-weight:700; }
+    .chk-content { flex:1; min-width:0; cursor:pointer; }
+    .chk-name { font-size:.88rem; font-weight:500; display:block; transition:all .2s; }
+    .chk-input:checked ~ .chk-content .chk-name { text-decoration:line-through; color:var(--dim); }
+    .chk-row:has(.chk-input:checked) { opacity:.6; }
+    .size-tag { display:inline-flex; align-items:center; gap:.25rem; margin-top:.28rem; font-size:.7rem; font-weight:600; padding:.18rem .45rem; border-radius:99px; background:rgba(124,58,237,.14); border:1px solid rgba(124,58,237,.35); color:var(--purplt); }
+    .size-note { display:block; font-size:.66rem; color:var(--dim); margin-top:.18rem; }
+    .formula-note { display:block; font-size:.66rem; color:var(--gold); margin-top:.12rem; font-family:monospace; }
+    .info-btn { background:none; border:none; color:#60a5fa; font-size:.82rem; cursor:pointer; padding:.2rem; flex-shrink:0; margin-top:1px; }
+    .modal-ov { position:fixed; inset:0; background:rgba(0,0,0,.75); z-index:200; display:none; align-items:flex-end; justify-content:center; padding:1rem; }
+    .modal-ov.open { display:flex; }
+    .modal-card { background:var(--card); border:1px solid var(--border); border-radius:16px; padding:1.25rem; width:100%; max-width:480px; max-height:80vh; overflow-y:auto; }
+    .modal-title { font-size:.88rem; font-weight:700; color:var(--gold); margin-bottom:.65rem; }
+    .modal-body { font-size:.78rem; color:var(--sub); line-height:1.65; white-space:pre-line; }
+    .modal-formula { background:rgba(124,58,237,.1); border:1px solid rgba(124,58,237,.3); border-radius:8px; padding:.55rem .75rem; font-family:monospace; color:var(--purplt); font-size:.78rem; margin:.65rem 0; white-space:pre-line; }
+    .modal-src { display:block; width:100%; text-align:center; background:var(--purple); color:#fff; font-size:.78rem; font-weight:600; padding:.55rem; border-radius:8px; text-decoration:none; margin-top:.65rem; }
+    .modal-close { display:block; width:100%; text-align:center; color:var(--dim); font-size:.78rem; padding:.55rem; margin-top:.4rem; cursor:pointer; border:none; background:none; }
+    .conf-ov { position:fixed; inset:0; background:rgba(0,0,0,.8); z-index:300; display:none; align-items:center; justify-content:center; padding:1rem; }
+    .conf-ov.open { display:flex; }
+    .conf-card { background:var(--card); border:1px solid var(--red); border-radius:var(--r); padding:1.5rem; width:100%; max-width:300px; text-align:center; }
+    .conf-title { font-size:.9rem; font-weight:700; margin-bottom:.4rem; }
+    .conf-sub { font-size:.76rem; color:var(--sub); margin-bottom:1.1rem; }
+    .conf-btns { display:flex; gap:.65rem; }
+    .conf-btns button { flex:1; padding:.55rem; border-radius:8px; font-size:.82rem; font-weight:600; cursor:pointer; border:none; }
+    .btn-cancel { background:var(--border); color:var(--text); }
+    .btn-ok { background:var(--red); color:#fff; }
+  </style>
+</head>
+<body>
+<header class="hdr">
+  <a href="index.html" class="back">← HOME</a>
+  <div class="hdr-title">OT PREP</div>
+  <button class="rst-btn" id="resetBtn">RESET</button>
+</header>
+<div class="prog-wrap">
+  <div class="prog-row"><span>Checklist Progress</span><span id="progTxt">0 / 40</span></div>
+  <div class="prog-bg"><div class="prog-fill" id="progFill"></div></div>
+</div>
+<div class="sec">
+  <div class="sec-title">Patient Details</div>
+  <div class="det-card">
+    <div class="det-toggle" id="detToggle"><span>Case Information</span><span class="arr">▼</span></div>
+    <div class="det-body" id="detBody">
+      <div class="irow c3">
+        <input type="number" id="f-age" placeholder="Age" min="0" step="0.1">
+        <select id="f-unit"><option value="years">Yrs</option><option value="months">Mo</option><option value="days">Days</option></select>
+        <select id="f-sex"><option value="">Sex</option><option value="male">Male</option><option value="female">Female</option></select>
+      </div>
+      <div class="irow c2">
+        <input type="number" id="f-wt" placeholder="Weight (kg)" min="0" step="0.1">
+        <input type="text" id="f-case" placeholder="Case type">
+      </div>
+      <div class="irow c1"><input type="text" id="f-proc" placeholder="Procedure"></div>
+      <div class="irow c1"><textarea id="f-comorbid" placeholder="Comorbidities"></textarea></div>
+      <div class="irow c1"><textarea id="f-concerns" placeholder="Concerns / Points of Note"></textarea></div>
+    </div>
+  </div>
+</div>
+<div class="bz-banner" id="bzBanner">
+  <div class="bz-dot" id="bzDot"></div>
+  <div>
+    <div class="bz-lbl">Broselow Tape Zone</div>
+    <div class="bz-name" id="bzName"></div>
+    <div class="bz-lbl" id="bzRange"></div>
+  </div>
+  <button class="bz-info-btn" onclick="openModal('broselow')">ℹ</button>
+</div>
+<div class="sec">
+  <div class="sec-title">OT Preparation Checklist</div>
+  <div id="grpContainer"></div>
+</div>
+<div class="modal-ov" id="infoModal" onclick="if(event.target===this)closeModal()">
+  <div class="modal-card">
+    <div class="modal-title" id="mTitle"></div>
+    <div class="modal-body" id="mBody"></div>
+    <div class="modal-formula" id="mFormula"></div>
+    <a class="modal-src" id="mLink" target="_blank" rel="noopener">Search Standard Sources →</a>
+    <button class="modal-close" onclick="closeModal()">Close</button>
+  </div>
+</div>
+<div class="conf-ov" id="confOv">
+  <div class="conf-card">
+    <div class="conf-title">Reset for new patient?</div>
+    <div class="conf-sub">All case details and checklist progress will be cleared.</div>
+    <div class="conf-btns">
+      <button class="btn-cancel" onclick="document.getElementById('confOv').classList.remove('open')">Cancel</button>
+      <button class="btn-ok" onclick="doReset()">Reset</button>
+    </div>
+  </div>
+</div>
+<script>
+'use strict';
+const GROUPS = [
+  {id:'consumables',label:'Consumables',color:'#f0c040',items:[{id:'fluids',name:'Fluids'},{id:'drugs',name:'Drugs'}]},
+  {id:'table',label:'Table Setup',color:'#a78bfa',items:[{id:'micropore',name:'Micropore'},{id:'marker',name:'Marker'},{id:'sterile-glove',name:'Sterile Glove in Pocket'},{id:'head-ring',name:'Head Ring'},{id:'pillow',name:'Pillow on Table'}]},
+  {id:'iv',label:'IV Access & Monitoring Setup',color:'#22d3ee',items:[{id:'chest-leads',name:'Chest Leads'},{id:'sterylene',name:'Sterylene'},{id:'gauze',name:'Gauze'},{id:'glove',name:'Glove'},{id:'canula',name:'Cannula'},{id:'canula-fix',name:'Cannula Fixation'}]},
+  {id:'airway',label:'Airway — Basics',color:'#34d399',items:[{id:'suction',name:'Suction'},{id:'mask',name:'Mask',sizeKey:'mask',refKey:'mask'},{id:'npa',name:'NPA',sizeKey:'npa',refKey:'npa'},{id:'opa',name:'OPA',sizeKey:'opa',refKey:'opa'},{id:'lig-jelly',name:'Lignocaine Jelly'}]},
+  {id:'intub',label:'Intubation',color:'#fb923c',items:[{id:'scope',name:'Scope with Blade',sizeKey:'blade',refKey:'blade'},{id:'bougie',name:'Bougie'},{id:'tube',name:'ETT (Tube)',sizeKey:'ett',refKey:'ett'},{id:'stylet',name:'Stylet (Flexometallic)'},{id:'igel',name:'iGel',sizeKey:'igel',refKey:'igel'}]},
+  {id:'post',label:'Post-Intubation',color:'#f472b6',items:[{id:'infl-syringe',name:'Inflation Syringe'},{id:'steth',name:'Stethoscope'},{id:'tube-fix',name:'Tube Fixator'},{id:'cat-mount',name:'Catheter Mount'}]},
+  {id:'monitor',label:'Monitoring',color:'#c084fc',items:[{id:'eye-cover',name:'Eye Cover'},{id:'rt',name:"RT (Ryle's Tube)"},{id:'temp-probe',name:'Temp Probe'},{id:'warmer',name:'Warmer'}]},
+  {id:'vent',label:'Ventilation',color:'#60a5fa',items:[{id:'o2-mask',name:'O₂ Mask'},{id:'nasal-prongs',name:'Nasal Prongs'},{id:'ambu',name:'Ambu Bag'},{id:'bains',name:"Bain's Circuit"}]},
+  {id:'emdrugs',label:'Emergency Drugs',color:'#f87171',items:[{id:'syringe-50',name:'50cc Syringe'},{id:'pmo',name:'PMO (Phenylephrine)'},{id:'norad',name:'Noradrenaline (Norad)'},{id:'vasopressin',name:'Vasopressin'},{id:'ropin',name:'Ropivacaine (Ropin)'}]},
+];
+const TOTAL=GROUPS.reduce((s,g)=>s+g.items.length,0);
+const REFS={
+  ett:{title:'ETT — Endotracheal Tube Sizing',body:`Adults:\n• Female: 7.0 – 7.5 mm ID, cuffed\n• Male:   8.0 – 8.5 mm ID, cuffed\n\nChildren ≥ 1 yr:\n• Cuffed (now preferred):  Age÷4 + 3.5 mm\n• Uncuffed (traditional):  Age÷4 + 4.0 mm\n\nInfants < 1 yr:\n• 3–12 months: 3.5 – 4.0 mm uncuffed\n• Term neonate: 3.0 – 3.5 mm uncuffed\n• Premature:    2.5 mm uncuffed\n\n★ Cuffed ETTs now preferred even in paediatrics (PALS 2020 update).`,formula:`Cuffed (peds):   Age÷4 + 3.5\nUncuffed (peds): Age÷4 + 4.0\n(Age in complete years)`,link:'https://pubmed.ncbi.nlm.nih.gov/?term=endotracheal+tube+size+pediatric+formula+anesthesia'},
+  blade:{title:'Laryngoscope — Blade Selection',body:`• Premature / Neonate: Miller 0\n• Infant < 1 yr:        Miller 1\n  (Straight preferred — cephalad larynx, large omega epiglottis)\n• 1–2 yrs:               Miller 1–2  or  Mac 2\n• 2–6 yrs:               Macintosh 2\n• 6–12 yrs:              Macintosh 3\n• Adults (standard):     Macintosh 3\n• Adults (large):        Macintosh 4\n\n★ Most followed: Mac 3 for adults, Miller 1 for infants.`,formula:`Neonate–infant → Miller (straight)\nChild–adult    → Macintosh (curved)`,link:'https://pubmed.ncbi.nlm.nih.gov/?term=laryngoscope+blade+size+selection+pediatric+anesthesia'},
+  mask:{title:'Face Mask — Size Guide',body:`• Size 0: Neonate / premature\n• Size 1: Infant (1–12 months)\n• Size 2: Small child (1–3 yrs)\n• Size 3: Child (3–7 yrs)\n• Size 4: Older child / small adult female\n• Size 5: Average adult\n• Size 6: Large adult\n\nFit: covers bridge of nose → chin cleft. No eye pressure.`,formula:`Bridge of nose → chin cleft\n(no eye pressure)`,link:'https://pubmed.ncbi.nlm.nih.gov/?term=anaesthesia+face+mask+size+selection'},
+  opa:{title:'OPA — Oropharyngeal (Guedel) Airway',body:`Sizing by length:\n• 000/00 (40–50 mm): Neonate\n• 0     (60 mm):      Infant\n• 1     (70 mm):      Small child\n• 2     (80 mm):      Child\n• 3     (90 mm):      Small adult\n• 4     (90–100 mm):  Adult\n\nMeasure: corner of mouth → angle of mandible\n\nColour coding (varies by manufacturer):\n• Neonate: colourless  • Infant: pink\n• Small child: blue    • Child: black\n• Small adult: white   • Adult: green\n• Large adult: yellow/orange\n\n⚠ Colours are MANUFACTURER-SPECIFIC. Verify with product.`,formula:`Corner of mouth → angle of mandible`,link:'https://pubmed.ncbi.nlm.nih.gov/?term=oropharyngeal+airway+size+selection+Guedel'},
+  npa:{title:'NPA — Nasopharyngeal Airway',body:`• Diameter ≈ patient's little finger width\n• Length: tip of nose → tragus of ear\n• Adult female: 6.0 – 7.0 mm ID\n• Adult male:   7.0 – 8.0 mm ID\n• Paediatric:   Age÷4 + 3 mm ID (approx)\n\nColour coding (manufacturer-specific):\n• White/clear: smaller (peds)\n• Orange/yellow: medium adult\n• Red/green: larger adult\n\n⚠ Contraindicated: basal skull fracture, coagulopathy, nasal pathology.`,formula:`Peds: Age÷4 + 3 mm ID\nLength: nostril tip → tragus`,link:'https://pubmed.ncbi.nlm.nih.gov/?term=nasopharyngeal+airway+size+formula+selection'},
+  igel:{title:'iGel — Supraglottic Airway (Intersurgical)',body:`Weight-based sizing (Intersurgical official):\n• Size 1:   2 – 5 kg\n• Size 1.5: 5 – 12 kg\n• Size 2:   10 – 25 kg\n• Size 2.5: 25 – 35 kg\n• Size 3:   30 – 60 kg\n• Size 4:   50 – 90 kg\n• Size 5:   > 90 kg\n\nFor overlapping ranges, choose the larger size if in doubt.\nSource: Intersurgical product IFU.`,formula:`Size based on WEIGHT (kg)`,link:'https://www.intersurgical.com/products/airway-management/igel'},
+  broselow:{title:'Broselow Tape — Paediatric Colour Zones',body:`Estimates weight from recumbent length (≤ 36 kg):\n• GREY:   3–5 kg   • PINK:   6–7 kg\n• RED:    8–9 kg   • PURPLE: 10–11 kg\n• YELLOW: 12–14 kg • WHITE:  15–18 kg\n• BLUE:   19–22 kg • ORANGE: 23–29 kg\n• GREEN:  30–36 kg\n\nMeasure: top of head → heel (supine, straight).`,formula:`Measure: top of head → heel (supine)`,link:'https://pubmed.ncbi.nlm.nih.gov/?term=Broselow+tape+paediatric+resuscitation+color+zone'},
+};
+function calcSizes(ageYrs,wt,sex){
+  const r={};
+  if(ageYrs!==null){
+    if(ageYrs>=14){r.ett=sex==='female'?{disp:'7.0–7.5 mm, cuffed',note:'Adult female'}:sex==='male'?{disp:'8.0–8.5 mm, cuffed',note:'Adult male'}:{disp:'7.0–8.5 mm, cuffed',note:'Enter sex for precise size'};}
+    else if(ageYrs>=1){const c=(ageYrs/4+3.5).toFixed(1),u=(ageYrs/4+4).toFixed(1);r.ett={disp:`${c} mm, cuffed`,formula:`Age÷4+3.5=${c} (cuffed) | Age÷4+4=${u} (uncuffed)`,note:'Cuffed preferred — PALS 2020'};}
+    else if(ageYrs>=0.25){r.ett={disp:'3.5–4.0 mm, uncuffed',note:'Infant 3–12 mo'};}
+    else{const s=(wt&&wt<2.5)?'2.5':'3.0–3.5';r.ett={disp:`${s} mm, uncuffed`,note:wt&&wt<2.5?'Premature neonate':'Term neonate'};}
+    if(ageYrs<0.083)r.blade={disp:'Miller 0',note:'Straight — cephalad larynx, large epiglottis'};
+    else if(ageYrs<1)r.blade={disp:'Miller 1',note:'Straight preferred for infants'};
+    else if(ageYrs<2)r.blade={disp:'Miller 1–2 / Mac 2',note:'Either acceptable'};
+    else if(ageYrs<6)r.blade={disp:'Macintosh 2',note:'Standard'};
+    else if(ageYrs<12)r.blade={disp:'Macintosh 3',note:'Standard'};
+    else r.blade={disp:'Macintosh 3',note:'Standard; Mac 4 for large adult'};
+    if(ageYrs<0.083)r.mask={disp:'Size 0',note:'Neonatal'};
+    else if(ageYrs<1)r.mask={disp:'Size 1',note:'Infant'};
+    else if(ageYrs<3)r.mask={disp:'Size 2',note:'Small child'};
+    else if(ageYrs<7)r.mask={disp:'Size 3',note:'Child'};
+    else if(ageYrs<12)r.mask={disp:'Size 4',note:'Older child'};
+    else r.mask={disp:sex==='female'?'Size 4–5':'Size 5',note:'Adult'};
+    const opaMap=[[0.083,{disp:'000/00 · 40–50 mm',note:'Neonate'}],[1,{disp:'Size 0 · 60 mm',note:'Infant'}],[3,{disp:'Size 1 · 70 mm',note:'Small child'}],[8,{disp:'Size 2 · 80 mm',note:'Child'}],[12,{disp:'Size 3 · 90 mm',note:'Older child / small adult'}],[Infinity,{disp:'Size 4 · 90–100 mm',note:'Adult — corner of mouth → angle of mandible'}]];
+    for(const [lim,v] of opaMap)if(ageYrs<lim){r.opa=v;break;}
+    if(ageYrs<1){r.npa={disp:'Generally avoided',note:'Risk: adenoid/mucosal trauma in neonates'};}
+    else if(ageYrs<14){const s=(ageYrs/4+3).toFixed(1);r.npa={disp:`${s} mm ID`,formula:`Age÷4+3 = ${s} mm`,note:'Diameter ≈ little finger; length: nostril → tragus'};}
+    else{r.npa={disp:sex==='female'?'6.0–7.0 mm':sex==='male'?'7.0–8.0 mm':'6.0–8.0 mm',note:'Diameter ≈ little finger; length: nostril → tragus'};}
+  }
+  if(wt){const ig=[[5,'Size 1','2–5 kg'],[12,'Size 1.5','5–12 kg'],[25,'Size 2','10–25 kg'],[35,'Size 2.5','25–35 kg'],[60,'Size 3','30–60 kg'],[90,'Size 4','50–90 kg'],[Infinity,'Size 5','>90 kg']];for(const [lim,sz,rng] of ig)if(wt<=lim){r.igel={disp:sz,note:rng};break;}}
+  if(wt&&ageYrs!==null&&ageYrs<12&&wt<=36){const bz=[[5,'GREY','#9ca3af','3–5 kg'],[7,'PINK','#f9a8d4','6–7 kg'],[9,'RED','#f87171','8–9 kg'],[11,'PURPLE','#c084fc','10–11 kg'],[14,'YELLOW','#fde047','12–14 kg'],[18,'WHITE','#e2e8f0','15–18 kg'],[22,'BLUE','#60a5fa','19–22 kg'],[29,'ORANGE','#fb923c','23–29 kg'],[36,'GREEN','#4ade80','30–36 kg']];for(const [lim,col,hex,rng] of bz)if(wt<=lim){r.broselow={col,hex,rng};break;}}
+  return r;
+}
+let checks={},caseData={};
+try{checks=JSON.parse(localStorage.getItem('otp_chk')||'{}');}catch(e){}
+try{caseData=JSON.parse(localStorage.getItem('otp_case')||'{}');}catch(e){}
+const saveChk=()=>localStorage.setItem('otp_chk',JSON.stringify(checks));
+const saveCase=()=>localStorage.setItem('otp_case',JSON.stringify(caseData));
+function buildChecklist(){
+  const cont=document.getElementById('grpContainer');
+  for(const g of GROUPS){
+    const card=document.createElement('div');card.className='grp-card';
+    const hdr=document.createElement('div');hdr.className='grp-hdr';hdr.style.cssText=`border-left-color:${g.color};color:${g.color}`;
+    hdr.innerHTML=`<span>${g.label}</span><span class="grp-cnt" id="gc-${g.id}"></span>`;card.appendChild(hdr);
+    for(const item of g.items){
+      const row=document.createElement('div');row.className='chk-row';
+      const cb=document.createElement('input');cb.type='checkbox';cb.className='chk-input';cb.id=`c-${item.id}`;cb.checked=!!checks[item.id];
+      cb.addEventListener('change',()=>{checks[item.id]=cb.checked;saveChk();updateProgress();updateCounts();});
+      const box=document.createElement('div');box.className='chk-box';box.addEventListener('click',()=>cb.click());
+      const content=document.createElement('div');content.className='chk-content';content.addEventListener('click',()=>cb.click());
+      const nm=document.createElement('span');nm.className='chk-name';nm.textContent=item.name;content.appendChild(nm);
+      if(item.sizeKey){const sw=document.createElement('div');sw.id=`sw-${item.id}`;content.appendChild(sw);}
+      row.appendChild(cb);row.appendChild(box);row.appendChild(content);
+      if(item.refKey){const ib=document.createElement('button');ib.className='info-btn';ib.textContent='ℹ';ib.addEventListener('click',e=>{e.stopPropagation();openModal(item.refKey);});row.appendChild(ib);}
+      card.appendChild(row);
+    }
+    cont.appendChild(card);
+  }
+}
+function updateSizes(){
+  const ageVal=parseFloat(document.getElementById('f-age').value);
+  const ageUnit=document.getElementById('f-unit').value;
+  const wt=parseFloat(document.getElementById('f-wt').value)||null;
+  const sex=document.getElementById('f-sex').value;
+  let ageYrs=null;
+  if(!isNaN(ageVal)){if(ageUnit==='years')ageYrs=ageVal;if(ageUnit==='months')ageYrs=ageVal/12;if(ageUnit==='days')ageYrs=ageVal/365;}
+  const sz=calcSizes(ageYrs,wt,sex);
+  const map=[['mask',sz.mask],['npa',sz.npa],['opa',sz.opa],['scope',sz.blade],['tube',sz.ett],['igel',sz.igel]];
+  for(const [id,data] of map){
+    const wrap=document.getElementById(`sw-${id}`);if(!wrap)continue;
+    if(!data){wrap.innerHTML='<span class="size-tag" style="opacity:.4">Enter patient details ↑</span>';continue;}
+    let h=`<span class="size-tag">⬧ ${data.disp}</span>`;
+    if(data.note)h+=`<span class="size-note">${data.note}</span>`;
+    if(data.formula)h+=`<span class="formula-note">${data.formula}</span>`;
+    wrap.innerHTML=h;
+  }
+  const ban=document.getElementById('bzBanner');
+  if(sz.broselow){const b=sz.broselow;ban.classList.add('vis');ban.style.cssText+=`;border-color:${b.hex};background:${b.hex}1a`;document.getElementById('bzDot').style.background=b.hex;const nm=document.getElementById('bzName');nm.textContent=b.col+' ZONE';nm.style.color=b.hex;document.getElementById('bzRange').textContent=b.rng;}
+  else{ban.classList.remove('vis');}
+}
+function updateProgress(){
+  const done=Object.values(checks).filter(Boolean).length;
+  document.getElementById('progTxt').textContent=`${done} / ${TOTAL}`;
+  document.getElementById('progFill').style.width=`${(done/TOTAL)*100}%`;
+}
+function updateCounts(){
+  for(const g of GROUPS){
+    const el=document.getElementById(`gc-${g.id}`);if(!el)continue;
+    const done=g.items.filter(i=>checks[i.id]).length;
+    el.textContent=`${done}/${g.items.length}`;
+    el.style.color=done===g.items.length?'#10b981':'';
+  }
+}
+function openModal(key){const info=REFS[key];if(!info)return;document.getElementById('mTitle').textContent=info.title;document.getElementById('mBody').textContent=info.body;document.getElementById('mFormula').textContent=info.formula||'';document.getElementById('mFormula').style.display=info.formula?'block':'none';document.getElementById('mLink').href=info.link;document.getElementById('infoModal').classList.add('open');}
+function closeModal(){document.getElementById('infoModal').classList.remove('open');}
+function setupInputs(){
+  const fields=[['f-age','age'],['f-unit','unit'],['f-sex','sex'],['f-wt','wt'],['f-case','case'],['f-proc','proc'],['f-comorbid','comorbid'],['f-concerns','concerns']];
+  for(const [elId,key] of fields){const el=document.getElementById(elId);if(!el)continue;if(caseData[key]!==undefined)el.value=caseData[key];const save=()=>{caseData[key]=el.value;saveCase();updateSizes();};el.addEventListener('input',save);el.addEventListener('change',save);}
+}
+document.getElementById('detToggle').addEventListener('click',()=>{document.getElementById('detToggle').classList.toggle('coll');document.getElementById('detBody').classList.toggle('hide');});
+document.getElementById('resetBtn').addEventListener('click',()=>{document.getElementById('confOv').classList.add('open');});
+function doReset(){checks={};caseData={};localStorage.removeItem('otp_chk');localStorage.removeItem('otp_case');['f-age','f-wt','f-case','f-proc','f-comorbid','f-concerns'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});document.getElementById('f-unit').value='years';document.getElementById('f-sex').value='';document.querySelectorAll('.chk-input').forEach(cb=>cb.checked=false);document.getElementById('confOv').classList.remove('open');updateSizes();updateProgress();updateCounts();}
+buildChecklist();setupInputs();updateSizes();updateProgress();updateCounts();
+</script>
+</body>
+</html>
